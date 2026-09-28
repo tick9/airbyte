@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tech Cover Qualifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e8ecea; --ink:#18222b; --muted:#566370; --line:#d3dad7;
+  --accent:#0d6b66; --accent-ink:#ffffff; --accent-soft:#dcefed;
+  --good:#2b7a4b; --good-soft:#e1f1e7; --warn:#9a6212; --warn-soft:#f8ecd6; --bad:#a8322a; --bad-soft:#f7e0dd;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#11181d; --surface:#18222a; --sunk:#0d1317; --ink:#e4ebe8; --muted:#95a3ad; --line:#2b3a44;
+  --accent:#4fb8b0; --accent-ink:#0b1a19; --accent-soft:#16302f;
+  --good:#6cc38f; --good-soft:#15291e; --warn:#e0a74e; --warn-soft:#2e2413; --bad:#ec7f75; --bad-soft:#321a18;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#11181d; --surface:#18222a; --sunk:#0d1317; --ink:#e4ebe8; --muted:#95a3ad; --line:#2b3a44;
+  --accent:#4fb8b0; --accent-ink:#0b1a19; --accent-soft:#16302f;
+  --good:#6cc38f; --good-soft:#15291e; --warn:#e0a74e; --warn-soft:#2e2413; --bad:#ec7f75; --bad-soft:#321a18;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);padding:24px 16px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1,h2,h3{font-family:var(--cond);font-weight:600;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:28px;letter-spacing:.01em}
+h2{font-size:21px}
+h3{font-size:16px}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:62ch;margin:6px 0 0}
+.mode{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 14px var(--sans);border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,label.opt:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.ghost{background:transparent}
+button:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+body.prospect .grid{grid-template-columns:minmax(0,760px);justify-content:center}
+body.prospect .adviser-only{display:none!important}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Stepper */
+.stepper{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px}
+.stepper button{flex:1 0 auto;border:0;border-bottom:3px solid var(--line);border-radius:0;background:transparent;text-align:left;padding:6px 10px 8px;font-size:13px;color:var(--muted)}
+.stepper button .n{font-family:var(--mono);font-size:11px;display:block}
+.stepper button.done{border-bottom-color:var(--accent-soft);color:var(--ink)}
+.stepper button.active{border-bottom-color:var(--accent);color:var(--ink);font-weight:600}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px}
+form{display:flex;flex-direction:column;gap:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.field>.lab{font-weight:600;font-size:14px}
+.hint{color:var(--muted);font-size:13px;margin-top:-2px}
+.req{color:var(--bad);font-weight:400}
+input[type=text],input[type=email],input[type=number],input[type=date],select,textarea{
+  font:15px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 11px;width:100%;max-width:420px}
+textarea{max-width:100%;min-height:80px;resize:vertical}
+input[type=number]{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+label.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 11px;cursor:pointer;background:var(--bg);font-size:14px}
+label.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+label.opt input{margin:3px 0 0;accent-color:var(--accent)}
+label.opt small{display:block;color:var(--muted);font-size:12px}
+.nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+.err{color:var(--bad);font-size:13px}
+
+/* Review */
+dl.review{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:6px 16px;margin:0;font-size:14px}
+dl.review dt{color:var(--muted)}
+dl.review dd{margin:0;overflow-wrap:anywhere}
+dl.review .sec{grid-column:1/-1;margin-top:10px;font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+@media (max-width:520px){dl.review{grid-template-columns:minmax(0,1fr)} dl.review dd{margin-bottom:6px}}
+pre.out{background:var(--sunk);border-radius:6px;padding:12px;font:12.5px/1.5 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;margin:0}
+
+/* Adviser panel */
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:14px}
+@media (max-width:900px){aside{position:static}}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.meter{font:500 12px var(--mono);color:var(--muted)}
+.prov{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.prov:first-of-type{border-top:0;padding-top:0}
+.prov-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.prov-name{font-weight:600}
+.prov-prod{color:var(--muted);font-size:12.5px}
+.score{font:500 20px var(--mono);font-variant-numeric:tabular-nums;text-align:right;line-height:1}
+.bar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.chip{display:inline-block;font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:4px;white-space:nowrap}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.refer{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+ul.reasons{margin:0;padding:0;list-style:none;font-size:13px;display:flex;flex-direction:column;gap:3px}
+ul.reasons li{padding-left:16px;position:relative}
+ul.reasons li::before{content:"";position:absolute;left:3px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+ul.reasons li.k::before{background:var(--bad)}
+ul.reasons li.r::before{background:var(--warn)}
+ul.reasons li.g::before{background:var(--muted)}
+ul.reasons li.p::before{background:var(--good)}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tools button{font-size:13px;padding:6px 10px}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+.banner{background:var(--warn-soft);color:var(--ink);border-radius:6px;padding:8px 12px;font-size:13px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+textarea#rules{font:12.5px/1.45 var(--mono);min-height:340px;background:var(--sunk)}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px}
+.thanks{display:flex;flex-direction:column;gap:12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Technology firms · UK · combined cover</div>
+      <h1 id="pageTitle">Insurance qualification</h1>
+      <p class="lede" id="lede">Tell us about your business. It takes about eight minutes. We use it to shortlist the insurers most likely to cover you, and on what terms.</p>
+    </div>
+    <div class="mode adviser-only">
+      <button type="button" id="btnExample" class="ghost">Load example</button>
+      <button type="button" id="btnClear" class="ghost">Clear for new prospect</button>
+      <button type="button" id="btnProspectView" class="ghost">Preview prospect view</button>
+    </div>
+  </header>
+
+  <div class="banner adviser-only" id="exampleBanner" hidden>
+    <span>Example answers loaded. These are sample figures, not a real prospect.</span>
+    <button type="button" id="btnClear2" class="ghost">Clear</button>
+  </div>
+  <div class="banner" id="backBanner" hidden>
+    <span>You are previewing the prospect view.</span>
+    <button type="button" id="btnAdviserView" class="ghost">Back to adviser view</button>
+  </div>
+
+  <div class="grid">
+    <main style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <nav class="stepper" id="stepper" aria-label="Steps"></nav>
+      <section class="card" id="stepCard" aria-live="polite"></section>
+    </main>
+
+    <aside class="adviser-only" aria-label="Adviser scoring">
+      <section class="card" style="display:flex;flex-direction:column;gap:14px">
+        <div class="panel-head">
+          <h2>Provider fit</h2>
+          <span class="meter" id="completeness"></span>
+        </div>
+        <div id="ranking" style="display:flex;flex-direction:column;gap:12px"></div>
+      </section>
+
+      <section class="card" style="display:flex;flex-direction:column;gap:10px">
+        <h3>Underwriting flags</h3>
+        <ul class="reasons" id="flags"></ul>
+      </section>
+
+      <section class="card" style="display:flex;flex-direction:column;gap:10px">
+        <h3>Export and rules</h3>
+        <div class="tools">
+          <button type="button" id="btnCopySummary">Copy summary</button>
+          <button type="button" id="btnCopyJson">Copy answers (JSON)</button>
+          <button type="button" id="btnRules">Edit provider rules</button>
+        </div>
+        <p class="note">Provider rules are starting assumptions. Check each insurer's current appetite guide and replace the figures.</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="card adviser-only" id="rulesCard" hidden style="display:flex;flex-direction:column;gap:12px">
+    <div class="panel-head"><h2>Provider rules</h2><span class="meter" id="rulesSource"></span></div>
+    <p class="note">Edit the JSON and apply. Changes save in this browser only. To make them permanent for the team, copy the JSON into <code>DEFAULT_PROVIDERS</code> in the page source and republish.</p>
+    <details>
+      <summary style="cursor:pointer;font-size:13.5px">Field reference</summary>
+      <pre class="out" style="margin-top:8px">lines.{pi,cyber,crime,gl,el,property,legal,dno}  0 = not offered, 1 = basic, 2 = standard, 3 = strong
+appetite.maxTurnover / maxEmployees             above = unlikely to quote
+appetite.referUSPct / maxUSPct                  US/Canada % turnover: above refer = refer, above max = unlikely
+appetite.maxPILimit                             above = refer (needs excess layer)
+appetite.minYearsTrading                        below = refer
+appetite.excludedActivities / referActivities   activity keys: see list below
+appetite.requiredControls                       control keys; missing = refer when cyber is needed
+appetite.declineIfPreviouslyDeclined            true = unlikely if prior decline/cancellation
+strengths.{price,breadth,claims,single}         1-3, matched against the prospect's top priority
+
+Activity keys: ACTIVITY_KEYS
+Control keys:  CONTROL_KEYS</pre>
+    </details>
+    <textarea id="rules" spellcheck="false" aria-label="Provider rules JSON"></textarea>
+    <div class="tools">
+      <button type="button" class="primary" id="btnApplyRules">Apply rules</button>
+      <button type="button" id="btnCopyRules">Copy JSON</button>
+      <button type="button" id="btnResetRules">Reset to defaults</button>
+      <button type="button" id="btnCloseRules" class="ghost">Close</button>
+    </div>
+    <span class="err" id="rulesErr"></span>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- Question set ---------- */
+const LINES = [
+  {v:'pi', t:'Professional indemnity', d:'Errors, negligence, breach of contract'},
+  {v:'cyber', t:'Cyber', d:'Breach response, extortion, business interruption'},
+  {v:'crime', t:'Crime and cyber crime', d:'Funds transfer and invoice fraud, employee theft'},
+  {v:'gl', t:'Public and products liability', d:'Injury or damage to third parties'},
+  {v:'el', t:"Employers' liability", d:'Legal requirement with employees'},
+  {v:'property', t:'Office contents and portable equipment', d:'Laptops, kit, office contents'},
+  {v:'legal', t:'Legal expenses', d:'Contract, employment and tax disputes'},
+  {v:'dno', t:'Directors and officers', d:'Personal liability of directors'}
+];
+const ACTIVITIES = [
+  {v:'consultancy', t:'IT or data consultancy'},
+  {v:'software', t:'Bespoke software development'},
+  {v:'saas', t:'SaaS or platform provider'},
+  {v:'msp', t:'Managed IT or cloud services'},
+  {v:'data', t:'Data processing or hosting'},
+  {v:'ai', t:'AI or machine learning products'},
+  {v:'hardware', t:'Hardware design or supply'},
+  {v:'telecoms', t:'Telecoms or network services'},
+  {v:'fintech', t:'Payments or fintech software'},
+  {v:'healthtech', t:'Health or medical software'},
+  {v:'crypto', t:'Crypto or blockchain'},
+  {v:'recruitment', t:'IT contractor or recruitment'}
+];
+const CONTROLS = [
+  {v:'mfaEmail', t:'MFA on all email accounts'},
+  {v:'mfaRemote', t:'MFA on remote access and admin accounts'},
+  {v:'backups', t:'Offline or immutable backups, restore tested in last 6 months'},
+  {v:'edr', t:'EDR on all endpoints'},
+  {v:'patching', t:'Critical patches applied within 14 days'},
+  {v:'training', t:'Phishing training at least yearly'},
+  {v:'ce', t:'Cyber Essentials or Cyber Essentials Plus'},
+  {v:'iso', t:'ISO 27001'}
+];
+const LIMITS = [
+  {v:'250000',t:'£250k'},{v:'500000',t:'£500k'},{v:'1000000',t:'£1m'},{v:'2000000',t:'£2m'},{v:'5000000',t:'£5m'},{v:'10000000',t:'£10m or more'}
+];
+const PRIORITIES = [
+  {v:'price', t:'Lowest premium'},
+  {v:'breadth', t:'Broadest cover'},
+  {v:'claims', t:'Claims and incident support'},
+  {v:'single', t:'Everything in one policy'}
+];
+const YN = [{v:'no',t:'No'},{v:'yes',t:'Yes'}];
+
+const STEPS = [
+  {id:'business', title:'Your business', fields:[
+    {id:'company', label:'Company name', type:'text', required:true},
+    {row:[
+      {id:'contact', label:'Your name', type:'text', required:true},
+      {id:'email', label:'Email', type:'email', required:true}
+    ]},
+    {id:'activities', label:'What does the business do?', hint:'Select all that apply.', type:'multi', options:ACTIVITIES, required:true},
+    {id:'description', label:'Describe your services in one or two sentences', hint:'Insurers classify you from this. Name the systems you work with, for example Dynamics 365, SAP or Power BI.', type:'textarea'},
+    {row:[
+      {id:'yearsTrading', label:'Years trading', type:'number', min:0},
+      {id:'employees', label:'Employees, including directors', type:'number', min:0}
+    ]},
+    {row:[
+      {id:'turnover', label:'Turnover, last full year (£)', type:'number', min:0, required:true},
+      {id:'turnoverNext', label:'Projected turnover, next 12 months (£)', type:'number', min:0}
+    ]}
+  ]},
+  {id:'clients', title:'Clients and contracts', fields:[
+    {id:'usPct', label:'Share of turnover from clients in the US or Canada (%)', hint:'Enter 0 if none.', type:'number', min:0, max:100, required:true},
+    {id:'regions', label:'Other territories you deliver work in', type:'multi', options:[{v:'uk',t:'UK only'},{v:'eu',t:'EU / EEA'},{v:'row',t:'Rest of world'}]},
+    {id:'sectors', label:'Client sectors', type:'multi', options:[
+      {v:'finance',t:'Financial services'},{v:'health',t:'Healthcare or NHS'},{v:'public',t:'Public sector'},
+      {v:'cni',t:'Critical national infrastructure'},{v:'retail',t:'Retail or ecommerce'},{v:'other',t:'Other commercial'}]},
+    {row:[
+      {id:'largestContract', label:'Largest single contract value (£)', type:'number', min:0},
+      {id:'subcontractPct', label:'Share of work done by subcontractors (%)', type:'number', min:0, max:100}
+    ]},
+    {id:'contractTerms', label:'Whose terms do you usually contract on?', type:'single', required:true, options:[
+      {v:'own', t:'Our own terms, liability capped'},
+      {v:'clientCapped', t:"Client's terms, liability capped"},
+      {v:'unlimited', t:"Client's terms, liability uncapped"},
+      {v:'none', t:'No written contracts'}]}
+  ]},
+  {id:'security', title:'Data and security', fields:[
+    {id:'records', label:'Personal data records you hold or process', type:'single', required:true, options:[
+      {v:'lt10k',t:'Under 10,000'},{v:'10k100k',t:'10,000 to 100,000'},{v:'100k1m',t:'100,000 to 1 million'},{v:'gt1m',t:'Over 1 million'}]},
+    {id:'cardData', label:'Do you store, process or transmit payment card data?', type:'single', options:YN, required:true},
+    {id:'controls', label:'Which security controls are in place today?', hint:'Tick only what is fully in place. Insurers verify this at claim time.', type:'multi', options:CONTROLS}
+  ]},
+  {id:'history', title:'Claims history', fields:[
+    {id:'claims', label:'Claims or cyber incidents in the last 5 years', type:'single', required:true, options:[{v:'0',t:'None'},{v:'1',t:'One'},{v:'2',t:'Two or more'}]},
+    {id:'circumstances', label:'Do you know of anything that could lead to a claim?', type:'single', options:YN, required:true},
+    {id:'declined', label:'Has an insurer declined, cancelled or put special terms on your cover in the last 5 years?', type:'single', options:YN, required:true},
+    {id:'historyDetail', label:'Give brief details', type:'textarea', showIf:a=>a.claims&&a.claims!=='0'||a.circumstances==='yes'||a.declined==='yes'}
+  ]},
+  {id:'cover', title:'Cover you need', fields:[
+    {id:'lines', label:'Which covers do you want quoted?', type:'multi', options:LINES, required:true},
+    {row:[
+      {id:'piLimit', label:'Professional indemnity limit', hint:'Check your largest contract for a minimum.', type:'select', options:LIMITS, showIf:a=>has(a.lines,'pi')},
+      {id:'cyberLimit', label:'Cyber limit', type:'select', options:LIMITS, showIf:a=>has(a.lines,'cyber')}
+    ]},
+    {id:'equipmentValue', label:'Value of laptops and portable equipment (£)', type:'number', min:0, showIf:a=>has(a.lines,'property')},
+    {row:[
+      {id:'currentInsurer', label:'Current insurer', hint:'Leave blank if none.', type:'text'},
+      {id:'renewal', label:'Renewal or start date', type:'date'}
+    ]},
+    {row:[
+      {id:'currentPremium', label:'Current annual premium (£)', type:'number', min:0},
+      {id:'retroDate', label:'Earliest continuous PI cover date', hint:'Your retroactive date. Keep it when switching.', type:'date'}
+    ]},
+    {id:'priority', label:'What matters most?', type:'single', options:PRIORITIES, required:true}
+  ]},
+  {id:'review', title:'Review and send', fields:[]}
+];
+
+/* ---------- Provider rules (illustrative starting points, verify with each insurer) ---------- */
+const DEFAULT_PROVIDERS = [
+  {id:'cfc', name:'CFC', product:'Technology (combined)',
+   notes:'Single wording covering PI, cyber, crime, GL, EL, property and legal expenses. In-house cyber incident response and Response app.',
+   lines:{pi:3,cyber:3,crime:3,gl:3,el:3,property:2,legal:2,dno:1},
+   appetite:{maxTurnover:100000000,maxEmployees:1000,referUSPct:50,maxUSPct:100,maxPILimit:10000000,minYearsTrading:0,
+     excludedActivities:[],referActivities:['crypto','healthtech'],requiredControls:['mfaEmail','mfaRemote','backups'],declineIfPreviouslyDeclined:false},
+   strengths:{price:2,breadth:3,claims:3,single:3}},
+  {id:'hiscox', name:'Hiscox', product:'Technology PI and business package',
+   notes:'Strong on small UK tech PI. Cyber and crime available as separate sections.',
+   lines:{pi:3,cyber:2,crime:1,gl:3,el:3,property:2,legal:1,dno:2},
+   appetite:{maxTurnover:10000000,maxEmployees:100,referUSPct:0,maxUSPct:20,maxPILimit:5000000,minYearsTrading:0,
+     excludedActivities:['crypto'],referActivities:['fintech','healthtech','telecoms','hardware'],requiredControls:['mfaEmail'],declineIfPreviouslyDeclined:true},
+   strengths:{price:3,breadth:2,claims:3,single:2}},
+  {id:'markel', name:'Markel', product:'Technology PI',
+   notes:'SME tech PI with legal expenses strength. Cyber via separate product.',
+   lines:{pi:3,cyber:2,crime:1,gl:3,el:3,property:1,legal:3,dno:2},
+   appetite:{maxTurnover:5000000,maxEmployees:50,referUSPct:0,maxUSPct:10,maxPILimit:5000000,minYearsTrading:1,
+     excludedActivities:['crypto','telecoms'],referActivities:['fintech','healthtech','ai','msp'],requiredControls:['mfaEmail'],declineIfPreviouslyDeclined:true},
+   strengths:{price:3,breadth:2,claims:2,single:2}},
+  {id:'beazley', name:'Beazley', product:'Cyber and tech E&O',
+   notes:'Cyber-led. Pair with a separate EL, GL and property package.',
+   lines:{pi:3,cyber:3,crime:2,gl:1,el:0,property:0,legal:0,dno:2},
+   appetite:{maxTurnover:250000000,maxEmployees:5000,referUSPct:60,maxUSPct:100,maxPILimit:10000000,minYearsTrading:0,
+     excludedActivities:[],referActivities:['crypto'],requiredControls:['mfaEmail','mfaRemote','backups','edr'],declineIfPreviouslyDeclined:false},
+   strengths:{price:1,breadth:3,claims:3,single:1}}
+];
+
+const EXAMPLE = {
+  company:'Northgate Data Ltd (example)', contact:'Sam Patel', email:'sam@example.com',
+  activities:['consultancy','data'], description:'Microsoft Dynamics 365 and Power BI implementation and reporting for mid-market manufacturers.',
+  yearsTrading:'9', employees:'12', turnover:'1450000', turnoverNext:'1700000',
+  usPct:'5', regions:['uk','eu'], sectors:['retail','other','finance'], largestContract:'220000', subcontractPct:'15', contractTerms:'clientCapped',
+  records:'10k100k', cardData:'no', controls:['mfaEmail','mfaRemote','backups','patching','training','ce'],
+  claims:'0', circumstances:'no', declined:'no', historyDetail:'',
+  lines:['pi','cyber','crime','gl','el','property','legal'], piLimit:'2000000', cyberLimit:'1000000', equipmentValue:'38000',
+  currentInsurer:'Hiscox', renewal:'2027-02-03', currentPremium:'3400', retroDate:'2017-04-01', priority:'single'
+};
+
+/* ---------- State ---------- */
+const store = {
+  get(k){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null }catch(e){ return null } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k) }catch(e){} }
+};
+const prospectMode = location.hash === '#prospect';
+let previewing = false;
+let answers = store.get(prospectMode ? 'tcq.prospect' : 'tcq.adviser') || (prospectMode ? {} : {...EXAMPLE});
+let usingExample = !prospectMode && !store.get('tcq.adviser');
+let providers = store.get('tcq.rules') || JSON.parse(JSON.stringify(DEFAULT_PROVIDERS));
+let step = 0;
+let submitted = false;
+
+function has(arr,v){ return Array.isArray(arr) && arr.includes(v) }
+function num(v){ const n=parseFloat(v); return isNaN(n)?null:n }
+function gbp(n){ if(n==null) return '—'; if(n>=1e6) return '£'+(n/1e6).toFixed(n%1e6?1:0)+'m'; if(n>=1e3) return '£'+Math.round(n/1e3)+'k'; return '£'+n }
+function label(list,v){ const o=list.find(x=>x.v===v); return o?o.t:v }
+function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+function save(){ store.set(prospectMode?'tcq.prospect':'tcq.adviser', answers); }
+function flatFields(s){ return s.fields.flatMap(f=>f.row?f.row:[f]) }
+function visible(f){ return !f.showIf || f.showIf(answers) }
+function filled(f){ const v=answers[f.id]; return Array.isArray(v)?v.length>0:(v!=null&&String(v).trim()!=='') }
+
+/* ---------- Rendering ---------- */
+function renderStepper(){
+  const el=document.getElementById('stepper');
+  el.innerHTML = STEPS.map((s,i)=>{
+    const done = i<STEPS.length-1 && flatFields(s).filter(f=>f.required&&visible(f)).every(filled);
+    return `<button type="button" data-i="${i}" class="${i===step?'active':''} ${done?'done':''}" aria-current="${i===step?'step':'false'}"><span class="n">${String(i+1).padStart(2,'0')}</span>${s.title}</button>`;
+  }).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{ step=+b.dataset.i; submitted=false; render() });
+}
+
+function fieldHtml(f){
+  if(!visible(f)) return '';
+  const v = answers[f.id];
+  const req = f.required?' <span class="req" aria-hidden="true">*</span>':'';
+  const hint = f.hint?`<div class="hint">${esc(f.hint)}</div>`:'';
+  if(f.type==='multi'||f.type==='single'){
+    const kind = f.type==='multi'?'checkbox':'radio';
+    const opts = f.options.map(o=>{
+      const on = f.type==='multi'?has(v,o.v):v===o.v;
+      return `<label class="opt"><input type="${kind}" name="${f.id}" id="${f.id}_${o.v}" value="${o.v}" ${on?'checked':''}><span>${esc(o.t)}${o.d?`<small>${esc(o.d)}</small>`:''}</span></label>`;
+    }).join('');
+    return `<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="lab" style="padding:0;margin-bottom:6px;font-weight:600;font-size:14px">${esc(f.label)}${req}</legend>${hint}<div class="opts">${opts}</div></fieldset>`;
+  }
+  if(f.type==='select'){
+    return `<div class="field"><label for="${f.id}">${esc(f.label)}${req}</label>${hint}<select id="${f.id}" name="${f.id}"><option value="">Select</option>${f.options.map(o=>`<option value="${o.v}" ${v===o.v?'selected':''}>${esc(o.t)}</option>`).join('')}</select></div>`;
+  }
+  if(f.type==='textarea'){
+    return `<div class="field"><label for="${f.id}">${esc(f.label)}${req}</label>${hint}<textarea id="${f.id}" name="${f.id}">${esc(v)}</textarea></div>`;
+  }
+  const extra = (f.min!=null?` min="${f.min}"`:'')+(f.max!=null?` max="${f.max}"`:'')+(f.type==='number'?' inputmode="decimal"':'');
+  return `<div class="field"><label for="${f.id}">${esc(f.label)}${req}</label>${hint}<input type="${f.type}" id="${f.id}" name="${f.id}" value="${esc(v)}"${extra}></div>`;
+}
+
+function renderStep(){
+  const card=document.getElementById('stepCard');
+  const s=STEPS[step];
+  if(s.id==='review'){ renderReview(card); return }
+  const body = s.fields.map(f=>f.row?`<div class="row2">${f.row.map(fieldHtml).join('')}</div>`:fieldHtml(f)).join('');
+  card.innerHTML = `<form id="stepForm" novalidate>
+    <div><div class="eyebrow">Step ${step+1} of ${STEPS.length}</div><h2 style="margin-top:6px">${s.title}</h2></div>
+    ${body}
+    <span class="err" id="stepErr" role="alert"></span>
+    <div class="nav">
+      <button type="button" id="btnBack" ${step===0?'disabled':''}>Back</button>
+      <button type="submit" class="primary">Continue</button>
+    </div></form>`;
+  const form=card.querySelector('form');
+  form.addEventListener('input',e=>readInput(e.target));
+  form.addEventListener('change',e=>{ readInput(e.target); if(e.target.type==='radio'||e.target.type==='checkbox'||e.target.tagName==='SELECT') rerenderKeepFocus(e.target) });
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const missing = flatFields(s).filter(f=>f.required&&visible(f)&&!filled(f));
+    if(missing.length){ document.getElementById('stepErr').textContent='Complete: '+missing.map(f=>f.label).join('; ')+'.'; return }
+    step++; render(); window.scrollTo({top:0});
+  });
+  document.getElementById('btnBack').onclick=()=>{ step=Math.max(0,step-1); render() };
+}
+
+function readInput(t){
+  if(!t.name) return;
+  if(t.type==='checkbox'){
+    const cur = new Set(answers[t.name]||[]);
+    t.checked?cur.add(t.value):cur.delete(t.value);
+    answers[t.name]=[...cur];
+  } else answers[t.name]=t.value;
+  save(); renderSide();
+}
+function rerenderKeepFocus(t){
+  const id=t.id; renderStep(); renderStepper();
+  const el=document.getElementById(id); if(el) el.focus({preventScroll:true});
+}
+
+function reviewRows(){
+  const out=[];
+  STEPS.slice(0,-1).forEach(s=>{
+    out.push({sec:s.title});
+    flatFields(s).filter(visible).forEach(f=>{
+      let v=answers[f.id];
+      if(f.options){ v = Array.isArray(v)? v.map(x=>label(f.options,x)).join(', ') : (v?label(f.options,v):'') }
+      else if(f.type==='number' && /£/.test(f.label)) v = v?'£'+Number(v).toLocaleString('en-GB'):'';
+      out.push({k:f.label, v:v||'—'});
+    });
+  });
+  return out;
+}
+
+function renderReview(card){
+  const missing = STEPS.slice(0,-1).flatMap((s,i)=>flatFields(s).filter(f=>f.required&&visible(f)&&!filled(f)).map(f=>({f,i})));
+  if(submitted){
+    card.innerHTML = `<div class="thanks">
+      <div class="eyebrow">Done</div><h2>Thank you, ${esc(answers.contact||'')}</h2>
+      <p style="margin:0">Your answers are ready. Copy them and send them to your adviser by email. We will come back with a shortlist of insurers and indicative terms.</p>
+      <div class="tools"><button type="button" class="primary" id="btnCopyP">Copy my answers</button><button type="button" id="btnEdit">Edit answers</button></div>
+      <pre class="out" id="summaryOut">${esc(summaryText(false))}</pre></div>`;
+    document.getElementById('btnCopyP').onclick=()=>copy(summaryText(false),'summaryOut');
+    document.getElementById('btnEdit').onclick=()=>{ submitted=false; step=0; render() };
+    return;
+  }
+  const rows = reviewRows().map(r=>r.sec?`<div class="sec">${esc(r.sec)}</div>`:`<dt>${esc(r.k)}</dt><dd>${esc(r.v)}</dd>`).join('');
+  card.innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
+    <div><div class="eyebrow">Step ${step+1} of ${STEPS.length}</div><h2 style="margin-top:6px">Review and send</h2></div>
+    ${missing.length?`<p class="err" style="margin:0">Some required answers are missing: ${missing.map(m=>`<a href="#" data-i="${m.i}">${esc(m.f.label)}</a>`).join('; ')}.</p>`:''}
+    <label class="opt" style="max-width:none"><input type="checkbox" id="declare" ${answers.declare?'checked':''}><span>I confirm these answers are true and complete to the best of my knowledge. I understand insurers rely on them and that incorrect answers can affect claims.</span></label>
+    <dl class="review">${rows}</dl>
+    <span class="err" id="reviewErr" role="alert"></span>
+    <div class="nav"><button type="button" id="btnBack">Back</button><button type="button" class="primary" id="btnSubmit">Finish</button></div></div>`;
+  card.querySelectorAll('a[data-i]').forEach(a=>a.onclick=e=>{ e.preventDefault(); step=+a.dataset.i; render() });
+  document.getElementById('declare').onchange=e=>{ answers.declare=e.target.checked; save() };
+  document.getElementById('btnBack').onclick=()=>{ step--; render() };
+  document.getElementById('btnSubmit').onclick=()=>{
+    if(missing.length){ document.getElementById('reviewErr').textContent='Complete the missing answers first.'; return }
+    if(!answers.declare){ document.getElementById('reviewErr').textContent='Tick the declaration to finish.'; return }
+    submitted=true; render();
+  };
+}
+
+/* ---------- Scoring ---------- */
+function assess(p){
+  const a=answers, ap=p.appetite||{}, k=[], r=[], g=[], plus=[];
+  const turnover=num(a.turnoverNext)??num(a.turnover), emp=num(a.employees), us=num(a.usPct), yrs=num(a.yearsTrading);
+  const acts=a.activities||[], ctrls=a.controls||[], need=a.lines||[];
+  if(turnover!=null && ap.maxTurnover!=null && turnover>ap.maxTurnover) k.push(`Turnover ${gbp(turnover)} above ${gbp(ap.maxTurnover)} appetite`);
+  if(emp!=null && ap.maxEmployees!=null && emp>ap.maxEmployees) k.push(`${emp} staff above ${ap.maxEmployees} maximum`);
+  if(us!=null){
+    if(ap.maxUSPct!=null && us>ap.maxUSPct) k.push(`US/Canada ${us}% above ${ap.maxUSPct}% maximum`);
+    else if(ap.referUSPct!=null && us>ap.referUSPct) r.push(`US/Canada ${us}% of turnover needs referral`);
+  }
+  acts.filter(x=>has(ap.excludedActivities,x)).forEach(x=>k.push(`Excludes ${label(ACTIVITIES,x).toLowerCase()}`));
+  acts.filter(x=>has(ap.referActivities,x)).forEach(x=>r.push(`Refers ${label(ACTIVITIES,x).toLowerCase()}`));
+  if(yrs!=null && ap.minYearsTrading && yrs<ap.minYearsTrading) r.push(`Under ${ap.minYearsTrading} year(s) trading`);
+  const piL=num(a.piLimit), cyL=num(a.cyberLimit);
+  if(ap.maxPILimit && has(need,'pi') && piL && piL>ap.maxPILimit) r.push(`PI limit ${gbp(piL)} needs an excess layer above ${gbp(ap.maxPILimit)}`);
+  if(ap.maxPILimit && has(need,'cyber') && cyL && cyL>ap.maxPILimit) r.push(`Cyber limit ${gbp(cyL)} needs an excess layer`);
+  if(has(need,'cyber')){
+    const miss=(ap.requiredControls||[]).filter(c=>!has(ctrls,c));
+    if(miss.length) r.push('Missing controls: '+miss.map(c=>label(CONTROLS,c)).join('; '));
+  }
+  if(a.claims==='2') r.push('Two or more claims in 5 years');
+  if(a.circumstances==='yes') r.push('Known circumstance to disclose');
+  if(a.declined==='yes') (ap.declineIfPreviouslyDeclined?k:r).push('Previous decline, cancellation or special terms');
+
+  let cov=0;
+  need.forEach(l=>{ const s=(p.lines||{})[l]||0; cov+=s/3; if(s===0) g.push(`Does not offer ${label(LINES,l).toLowerCase()}`); else if(s===1) g.push(`Limited ${label(LINES,l).toLowerCase()} cover`); else if(s===3) plus.push(label(LINES,l)); });
+  const coverage = need.length? cov/need.length : 0;
+  const pri = a.priority ? ((p.strengths||{})[a.priority]||0)/3 : 0.5;
+  let score = Math.round(coverage*70 + pri*30) - r.length*8;
+  score = Math.max(0, Math.min(100, score));
+  const status = k.length ? 'bad' : r.length ? 'refer' : 'good';
+  if(k.length) score = Math.min(score, 15);
+  return {p, score, status, k, r, g, plus};
+}
+
+function generalFlags(){
+  const a=answers, f=[];
+  if(a.contractTerms==='unlimited') f.push(['k','Uncapped liability in client contracts. Expect PI terms to exclude or limit this.']);
+  if(a.contractTerms==='none') f.push(['r','No written contracts. Weakens PI defence and scope of services.']);
+  if(a.cardData==='yes') f.push(['r','Handles card data. Confirm PCI DSS status and PCI fines cover.']);
+  if(has(a.lines,'cyber') && !has(a.controls,'mfaEmail')) f.push(['k','No MFA on email. Most cyber markets decline without it.']);
+  if(has(a.lines,'cyber') && !has(a.controls,'backups')) f.push(['r','No tested offline backups. Ransomware terms will tighten.']);
+  if(a.records==='gt1m') f.push(['r','Over 1m personal records. Cyber limit of £1m is likely too low.']);
+  if(has(a.sectors,'health')||has(a.sectors,'cni')||has(a.sectors,'public')) f.push(['g','Regulated or public sector clients. Check contract insurance minimums.']);
+  if(num(a.subcontractPct)>25) f.push(['g','Over 25% subcontracted. Confirm back-to-back contracts and sub-contractor vicarious cover.']);
+  const lc=num(a.largestContract), pl=num(a.piLimit);
+  if(lc && pl && lc>pl) f.push(['r',`Largest contract ${gbp(lc)} exceeds PI limit ${gbp(pl)}.`]);
+  if(a.currentInsurer && a.retroDate) f.push(['g',`Keep retroactive date ${a.retroDate} on any new PI policy.`]);
+  if(a.currentInsurer && !a.retroDate && has(a.lines,'pi')) f.push(['r','Retroactive date missing. Ask for the current PI schedule.']);
+  if(!has(a.lines,'el') && num(a.employees)>1) f.push(['k',"Employers' liability not selected. Legal requirement with employees."]);
+  return f;
+}
+
+function completeness(){
+  const all = STEPS.slice(0,-1).flatMap(flatFields).filter(visible);
+  const done = all.filter(filled).length;
+  return Math.round(done/all.length*100);
+}
+
+function renderSide(){
+  if(prospectMode && !previewing) return;
+  document.getElementById('completeness').textContent = completeness()+'% answered';
+  const res = providers.map(assess).sort((x,y)=>y.score-x.score);
+  const chip = {good:['good','Good fit'],refer:['refer','Refer'],bad:['bad','Unlikely']};
+  document.getElementById('ranking').innerHTML = (answers.lines||[]).length ? res.map((x,i)=>`
+    <div class="prov">
+      <div class="prov-head">
+        <div><div class="prov-name">${i===0&&x.status!=='bad'?'<span class="eyebrow" style="color:var(--accent)">Lead option · </span>':''}${esc(x.p.name)}</div><div class="prov-prod">${esc(x.p.product)}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><span class="score">${x.score}</span><span class="chip ${chip[x.status][0]}">${chip[x.status][1]}</span></div>
+      </div>
+      <div class="bar" aria-hidden="true"><i style="width:${x.score}%"></i></div>
+      <ul class="reasons">
+        ${x.k.map(t=>`<li class="k">${esc(t)}</li>`).join('')}
+        ${x.r.map(t=>`<li class="r">${esc(t)}</li>`).join('')}
+        ${x.g.map(t=>`<li class="g">${esc(t)}</li>`).join('')}
+        ${x.plus.length?`<li class="p">Strong on ${esc(x.plus.join(', ').toLowerCase())}</li>`:''}
+      </ul>
+    </div>`).join('') : '<p class="note">Select the covers needed in step 5 to score providers.</p>';
+  const fl = generalFlags();
+  document.getElementById('flags').innerHTML = fl.length ? fl.map(([c,t])=>`<li class="${c}">${esc(t)}</li>`).join('') : '<li class="p">No general flags from answers so far.</li>';
+}
+
+/* ---------- Export ---------- */
+function summaryText(withScores){
+  const lines=[`Insurance qualification: ${answers.company||'(no company name)'}`, `Completed: ${new Date().toLocaleDateString('en-GB')}`, ''];
+  reviewRows().forEach(r=>{ if(r.sec) lines.push('', r.sec.toUpperCase()); else lines.push(`${r.k}: ${r.v}`) });
+  if(withScores){
+    lines.push('', 'PROVIDER FIT');
+    providers.map(assess).sort((x,y)=>y.score-x.score).forEach(x=>{
+      lines.push(`${x.p.name} (${x.p.product}): ${x.score}/100, ${({good:'good fit',refer:'refer',bad:'unlikely'})[x.status]}`);
+      [...x.k,...x.r,...x.g].forEach(t=>lines.push('  - '+t));
+    });
+    const fl=generalFlags(); if(fl.length){ lines.push('', 'UNDERWRITING FLAGS'); fl.forEach(([,t])=>lines.push('  - '+t)) }
+  }
+  return lines.join('\n');
+}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200) }
+function copy(text, fallbackId){
+  const done=()=>toast('Copied');
+  const fail=()=>{ const el=fallbackId&&document.getElementById(fallbackId); if(el){ const rg=document.createRange(); rg.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(rg); toast('Selected. Press Ctrl+C or Cmd+C to copy.') } else toast('Copy blocked in this view.') };
+  try{ navigator.clipboard.writeText(text).then(done,fail) }catch(e){ fail() }
+}
+
+/* ---------- Rules editor ---------- */
+function openRules(){
+  const c=document.getElementById('rulesCard'); c.hidden=false;
+  document.getElementById('rules').value=JSON.stringify(providers,null,2);
+  document.getElementById('rulesSource').textContent = store.get('tcq.rules')?'Custom rules in this browser':'Default rules';
+  document.getElementById('rulesErr').textContent='';
+  c.scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- Wiring ---------- */
+function render(){
+  document.body.classList.toggle('prospect', prospectMode || previewing);
+  document.getElementById('backBanner').hidden = !previewing;
+  document.getElementById('exampleBanner').hidden = !(usingExample && !previewing);
+  renderStepper(); renderStep(); renderSide();
+}
+function clearAll(){ answers={}; usingExample=false; save(); step=0; submitted=false; render(); toast('Cleared') }
+
+document.querySelector('pre.out').textContent = document.querySelector('pre.out').textContent
+  .replace('ACTIVITY_KEYS', ACTIVITIES.map(a=>a.v).join(', ')).replace('CONTROL_KEYS', CONTROLS.map(c=>c.v).join(', '));
+document.getElementById('btnExample').onclick=()=>{ answers={...EXAMPLE}; usingExample=true; store.del('tcq.adviser'); step=0; submitted=false; render(); toast('Example loaded') };
+document.getElementById('btnClear').onclick=clearAll;
+document.getElementById('btnClear2').onclick=clearAll;
+document.getElementById('btnProspectView').onclick=()=>{ previewing=true; step=0; submitted=false; render(); window.scrollTo({top:0}) };
+document.getElementById('btnAdviserView').onclick=()=>{ previewing=false; render() };
+document.getElementById('btnCopySummary').onclick=()=>copy(summaryText(true));
+document.getElementById('btnCopyJson').onclick=()=>copy(JSON.stringify({answers, scoredAt:new Date().toISOString(), results:providers.map(assess).map(x=>({provider:x.p.id,score:x.score,status:x.status,knockouts:x.k,refers:x.r,gaps:x.g}))},null,2));
+document.getElementById('btnRules').onclick=openRules;
+document.getElementById('btnCloseRules').onclick=()=>document.getElementById('rulesCard').hidden=true;
+document.getElementById('btnCopyRules').onclick=()=>copy(document.getElementById('rules').value,'rules');
+document.getElementById('btnResetRules').onclick=()=>{ providers=JSON.parse(JSON.stringify(DEFAULT_PROVIDERS)); store.del('tcq.rules'); openRules(); renderSide(); toast('Default rules restored') };
+document.getElementById('btnApplyRules').onclick=()=>{
+  const err=document.getElementById('rulesErr');
+  try{
+    const v=JSON.parse(document.getElementById('rules').value);
+    if(!Array.isArray(v)||!v.every(p=>p&&p.id&&p.name&&p.lines&&p.appetite)) throw new Error('Each provider needs id, name, lines and appetite.');
+    providers=v; store.set('tcq.rules',v); err.textContent=''; renderSide();
+    document.getElementById('rulesSource').textContent='Custom rules in this browser'; toast('Rules applied');
+  }catch(e){ err.textContent='Rules not applied. '+e.message }
+};
+if(prospectMode){ document.getElementById('pageTitle').textContent='Insurance qualification' }
+render();
+</script>
+</body>
+</html>
