@@ -116,6 +116,16 @@ ul.reasons li.p::before{background:var(--good)}
 textarea#rules{font:12.5px/1.45 var(--mono);min-height:340px;background:var(--sunk)}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px}
 .thanks{display:flex;flex-direction:column;gap:12px}
+button.cite{font:600 10.5px/1 var(--mono);letter-spacing:.04em;padding:2px 5px;margin-left:4px;border-radius:3px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);vertical-align:1px;cursor:help}
+button.cite:hover,button.cite[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink)}
+#pop{position:fixed;z-index:20;width:min(420px,calc(100vw - 32px));max-height:min(60vh,480px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--accent);border-radius:8px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:12px;font-size:13px}
+#pop .c-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+#pop .c-ref{font-weight:600;font-family:var(--cond);font-size:15px}
+#pop .c-src{font:500 11px/1.4 var(--mono);color:var(--muted)}
+#pop blockquote{margin:0;padding:8px 0 8px 12px;border-left:3px solid var(--accent);background:var(--sunk);border-radius:0 4px 4px 0;line-height:1.5}
+#pop .c-why{color:var(--muted);margin:0}
+#pop .c-item{display:flex;flex-direction:column;gap:6px}
+#pop .c-item+.c-item{border-top:1px solid var(--line);padding-top:12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -205,6 +215,7 @@ Control keys:  CONTROL_KEYS</pre>
   </section>
 </div>
 <div class="toast" id="toast" hidden></div>
+<div id="pop" role="tooltip" hidden></div>
 
 <script>
 /* ---------- Question set ---------- */
@@ -325,8 +336,17 @@ const DEFAULT_PROVIDERS = [
    notes:'Single wording covering PI, cyber, crime, GL, EL, property and legal expenses. In-house cyber incident response and Response app.',
    lines:{pi:3,cyber:3,crime:3,gl:3,el:3,property:2,legal:2,dno:1},
    appetite:{maxTurnover:100000000,maxEmployees:1000,referUSPct:50,maxUSPct:100,maxPILimit:10000000,minYearsTrading:0,
-     excludedActivities:[],referActivities:['crypto','healthtech'],requiredControls:['mfaEmail','mfaRemote','backups'],declineIfPreviouslyDeclined:false},
-   strengths:{price:2,breadth:3,claims:3,single:3}},
+     excludedActivities:['crypto'],referActivities:['healthtech'],requiredControls:['mfaEmail','mfaRemote','backups'],declineIfPreviouslyDeclined:false},
+   strengths:{price:2,breadth:3,claims:3,single:3},
+   citations:{
+     lines:{pi:['cfc.ic1a','cfc.ic1b'],cyber:['cfc.ic5','cfc.ic6'],crime:['cfc.ic3a'],gl:['cfc.ic8a'],el:['cfc.ic9'],property:['cfc.ic10c','cfc.sched.property'],legal:['cfc.ic12a'],dno:['cfc.ex30']},
+     activities:{crypto:['cfc.ex28']},
+     us:['cfc.usAggregate','cfc.sched.legalAction'],
+     piLimit:['cfc.sched.pi'],
+     controls:['cfc.noControlsClause','cfc.subjectivity'],
+     claims:['cfc.ex41'], circumstances:['cfc.ex41','cfc.notify'], declined:['cfc.ex41'],
+     flags:{unlimited:['cfc.ex23','cfc.ex43'],cardData:['cfc.ic4e','cfc.ex50'],retro:['cfc.ex59','cfc.sched.retro'],subcontract:['cfc.ic1c'],el:['cfc.ic9'],records:['cfc.ic5']}
+   }},
   {id:'hiscox', name:'Hiscox', product:'Technology PI and business package',
    notes:'Strong on small UK tech PI. Cyber and crime available as separate sections.',
    lines:{pi:3,cyber:2,crime:1,gl:3,el:3,property:2,legal:1,dno:2},
@@ -346,6 +366,92 @@ const DEFAULT_PROVIDERS = [
      excludedActivities:[],referActivities:['crypto'],requiredControls:['mfaEmail','mfaRemote','backups','edr'],declineIfPreviouslyDeclined:false},
    strengths:{price:1,breadth:3,claims:3,single:1}}
 ];
+
+/* ---------- Policy citations (verbatim extracts; page = printed page number) ---------- */
+const DOCS = {
+  wording:'CFC Technology v3.0 policy wording',
+  schedule:'CFC policy schedule ESO0040684586 (Tick9, 03 Feb 2026 – 03 Feb 2027)'
+};
+const CITATIONS = {
+  'cfc.ic1a':{doc:'wording',ref:'Insuring Clause 1, Section A: Products and services liability',page:'p.1–2',
+    quote:'We agree to pay on your behalf all sums which you become legally obliged to pay … as a result of any claim first made against you during the period of the policy … arising out of your technology services for any: a. negligent act, error, omission, misstatement or misrepresentation; b. breach of any contractual term implied by law concerning necessary quality, safety or fitness, or your duty to use reasonable care and skill; c. failure of a product to perform or function as intended …',
+    why:'Core PI cover. Claims-made basis, so the retroactive date matters.'},
+  'cfc.ic1b':{doc:'wording',ref:'Insuring Clause 1, Section B: Breach of contract',page:'p.2',
+    quote:'… as a direct result of any unintentional breach of a contract with a client for the provision of your technology services.',
+    why:'Wider than many PI wordings, which cover negligence only.'},
+  'cfc.ic1c':{doc:'wording',ref:'Insuring Clause 1, Section C: Sub-contractor vicarious liability',page:'p.2',
+    quote:'… as a direct result of any act, error or omission committed by any sub-contractor engaged by you for the provision of your technology services.',
+    why:'Covers liability for subcontractor mistakes. Recovery against the subcontractor still depends on your contract with them.'},
+  'cfc.ic3a':{doc:'wording',ref:'Insuring Clause 3, Section A: Funds transfer fraud',page:'p.4',
+    quote:'We agree to reimburse you for loss first discovered by you during the period of the policy as a direct result of any third party committing: a. any unauthorised electronic transfer of company funds from a bank or other financial institution …',
+    why:'Clause 3 runs to Sections A–K, including invoice manipulation, new vendor fraud and customer payment fraud.'},
+  'cfc.ic4e':{doc:'wording',ref:'Insuring Clause 4, Section E: PCI fines, penalties and assessments',page:'p.7',
+    quote:'… as a direct result of a payment card breach first discovered by you during the period of the policy.',
+    why:'PCI fines are covered here and nowhere else in the policy.'},
+  'cfc.ic5':{doc:'wording',ref:'Insuring Clause 5: Cyber incident response',page:'p.8–10',
+    quote:'Sections A–G: incident response costs, legal and regulatory costs, IT security and forensic costs, crisis communication costs, privacy breach management costs, third party privacy breach management costs, post breach remediation costs.',
+    why:'The schedule sets Section A incident response costs at a GBP0 deductible.'},
+  'cfc.ic6':{doc:'wording',ref:'Insuring Clause 6: Cyber extortion',page:'p.10',
+    quote:'We agree to pay on behalf of the company any ransom in response to an extortion demand made against you and first discovered by you during the period of the policy as a direct result of any actual or threat of: a. introduction of malware, including ransomware, into your computer systems …',
+    why:'Ransom and negotiation costs are covered, including costs to procure cryptocurrency.'},
+  'cfc.ic8a':{doc:'wording',ref:'Insuring Clause 8, Section A: Public liability',page:'p.12–13',
+    quote:'… as a result of any claim arising out of bodily injury or property damage first occurring during the period of the policy, except when it is caused directly by your technology services.',
+    why:'Injury or damage caused by your technology services goes under PI (Clause 1A, item d), not here.'},
+  'cfc.ic9':{doc:'wording',ref:"Insuring Clause 9: Employers' liability",page:'p.13',
+    quote:"… as a result of any claim arising out of accidental bodily injury first occurring during the period of the policy to your employees. … The insurance granted under this Section is in accordance with the provisions of any law relating to compulsory insurance of liability to employees in Great Britain …",
+    why:'Meets the compulsory EL requirement. The Tick9 schedule sets the limit at GBP10m.'},
+  'cfc.ic10c':{doc:'wording',ref:'Insuring Clause 10, Section C: Portable contents',page:'p.14',
+    quote:'… to repair or replace your portable contents, including laptops, mobile phones, cameras and other portable electronic equipment and tools that have been lost or damaged at or away from your premises during the period of the policy.',
+    why:'Covers kit anywhere. Averaging applies if the declared value is too low (p.21).'},
+  'cfc.sched.property':{doc:'schedule',ref:'Insuring Clause 10: Commercial property',page:'p.10',
+    quote:'SECTION A: BUILDINGS DAMAGE – NO COVER GIVEN. SECTION B: GENERAL CONTENTS DAMAGE – NO COVER GIVEN. SECTION C: PORTABLE CONTENTS – GBP42,550 in the aggregate, declared value GBP37,000.',
+    why:'Property sections are selected per client. Scored 2 because buildings and office contents need adding at quote.'},
+  'cfc.ic12a':{doc:'wording',ref:'Insuring Clause 12, Section A: Contractual disputes',page:'p.17',
+    quote:'… arising out of a contractual dispute under the Sale of Goods Act 1979 or the Supply of Goods and Services Act 1982 …',
+    why:'Legal expenses are UK only (schedule, territorial scope). The Tick9 schedule sets GBP50k per claim and GBP100k in the aggregate.'},
+  'cfc.ex23':{doc:'wording',ref:'Exclusion 23: Breach of contract',page:'p.38',
+    quote:'arising directly out of any breach of contract. However, this Exclusion will not apply to: a. INSURING CLAUSES 1 (SECTIONS A, B and D only) and 12 (SECTIONS A and C only) …',
+    why:'Only unintentional breach is covered (1B). Uncapped indemnities and guarantees go beyond this.'},
+  'cfc.ex43':{doc:'wording',ref:'Exclusion 43: Liquidated damages, service credits and penalty clauses',page:'p.42',
+    quote:'for liquidated damages or service credits, or arising out of penalty clauses unless you would have been liable in the absence of any contract stipulating the liquidated damages or service credits or penalty clauses.',
+    why:'Service credits and SLA penalties in client terms are not insured.'},
+  'cfc.ex28':{doc:'wording',ref:'Exclusion 28: Cryptocurrency',page:'p.39',
+    quote:'arising directly or indirectly out of any: a. theft or loss of; or b. provision of, or failure to provide, any advice, consultancy or any other services or activities relating to; any crypto asset, including cryptocurrency, utility tokens, securities tokens, ecosystem tokens or any other type of digital currency.',
+    why:'Applies to every insuring clause. Crypto work is uninsured under this wording.'},
+  'cfc.ex30':{doc:'wording',ref:'Exclusion 30: Directors and officers liability',page:'p.39',
+    quote:'arising out of any personal liability incurred by your senior executive officers when they are acting in that capacity or managing you … However, this Exclusion will not apply to INSURING CLAUSE 4 (SECTION C only).',
+    why:'D&O is only covered for cyber events (4C, management liability). Full D&O needs a separate policy.'},
+  'cfc.ex41':{doc:'wording',ref:'Exclusion 41: Known claims and circumstances',page:'p.41',
+    quote:'arising out of any actual or suspected cyber event, claim, loss, operator error, system failure or circumstance which might give rise to a claim under this Policy which a senior executive officer was aware of, or ought reasonably to have been aware of, prior to the continuity date, including any claim or circumstance notified to any other insurer.',
+    why:'Known issues must go to the current insurer before switching.'},
+  'cfc.notify':{doc:'wording',ref:'Condition: Notification',page:'p.47',
+    quote:'If any senior executive officer becomes aware of any incident which may reasonably be expected to give rise to a claim under this Policy you must: a. notify the claims managers as soon as is reasonably practicable …',
+    why:'Notify the current insurer now, before the policy lapses.'},
+  'cfc.ex50':{doc:'wording',ref:'Exclusion 50: Payment card industry fines',page:'p.43',
+    quote:'for fines, penalties and card brand assessments … which you become legally obliged to pay your acquiring bank or payment processor as a direct result of a payment card breach. However, this Exclusion will not apply to INSURING CLAUSE 4 (SECTION E only).',
+    why:'Check Clause 4E is included in the quote.'},
+  'cfc.ex59':{doc:'wording',ref:'Exclusion 59: Retroactive date',page:'p.44',
+    quote:'in respect of INSURING CLAUSES 1 and 12, arising out of any act, error or omission committed or alleged to have been committed on or before the retroactive date …',
+    why:'A later retroactive date leaves past work uninsured.'},
+  'cfc.sched.retro':{doc:'schedule',ref:'Schedule: Retroactive date(s)',page:'p.2',
+    quote:'RETROACTIVE DATE(S): Professional Liability: 01 Jan 2015. Legal Expenses: 01 Jan 2015.',
+    why:'Tick9 benchmark. A switching prospect should keep their earliest continuous date in the same way.'},
+  'cfc.usAggregate':{doc:'wording',ref:'Limit of liability: US claims',page:'p.21',
+    quote:'Notwithstanding the limit of liability, for any claim made against you within the United States of America or territories which come under the jurisdiction of the United States of America, the limit of liability will be an annual aggregate limit for all claims under this Policy and inclusive of costs and expenses.',
+    why:'US claims share one aggregate limit, including defence costs.'},
+  'cfc.sched.legalAction':{doc:'schedule',ref:'Schedule: Legal action and territorial scope',page:'p.2',
+    quote:'LEGAL ACTION: Worldwide excl. US & Canada, but United Kingdom only in respect of INSURING CLAUSE 12. TERRITORIAL SCOPE: Worldwide, but United Kingdom only in respect of INSURING CLAUSE 12.',
+    why:'The Tick9 schedule excludes US/Canada suits. A prospect with US revenue needs a quote with US jurisdiction.'},
+  'cfc.sched.pi':{doc:'schedule',ref:'Schedule: Insuring Clause 1 limit',page:'p.4',
+    quote:'SECTION A: PRODUCTS AND SERVICES LIABILITY – Limit of liability: GBP1,000,000 each and every claim, including costs and expenses. Deductible: GBP1,000 each and every claim, including costs and expenses.',
+    why:'Tick9 benchmark. The limit includes defence costs.'},
+  'cfc.noControlsClause':{doc:'wording',ref:'No MFA or backup clause in the wording',page:'—',
+    quote:'The Technology v3.0 wording contains no MFA, backup or EDR condition.',
+    why:'CFC asks about these controls on the proposal form, and the signed form becomes part of the contract. The control requirement in this tool is an underwriting assumption. Confirm it with CFC.'},
+  'cfc.subjectivity':{doc:'schedule',ref:'Endorsement: Subjectivity condition clause',page:'p.20',
+    quote:'Signed version of the application form submitted, dated within 30 days of the required inception date. … Satisfactory confirmation that you have downloaded & registered our incident response mobile app …',
+    why:'Cover is conditional on these. Missing them allows CFC to change terms or cancel.'}
+};
 
 const EXAMPLE = {
   company:'Northgate Data Ltd (example)', contact:'Sam Patel', email:'sam@example.com',
@@ -500,31 +606,41 @@ function renderReview(card){
 
 /* ---------- Scoring ---------- */
 function assess(p){
-  const a=answers, ap=p.appetite||{}, k=[], r=[], g=[], plus=[];
+  const a=answers, ap=p.appetite||{}, ct=p.citations||{}, k=[], r=[], g=[], plus=[];
+  const it=(t,c)=>({t, c:(c||[]).filter(x=>CITATIONS[x])});
   const turnover=num(a.turnoverNext)??num(a.turnover), emp=num(a.employees), us=num(a.usPct), yrs=num(a.yearsTrading);
   const acts=a.activities||[], ctrls=a.controls||[], need=a.lines||[];
-  if(turnover!=null && ap.maxTurnover!=null && turnover>ap.maxTurnover) k.push(`Turnover ${gbp(turnover)} above ${gbp(ap.maxTurnover)} appetite`);
-  if(emp!=null && ap.maxEmployees!=null && emp>ap.maxEmployees) k.push(`${emp} staff above ${ap.maxEmployees} maximum`);
+  if(turnover!=null && ap.maxTurnover!=null && turnover>ap.maxTurnover) k.push(it(`Turnover ${gbp(turnover)} above ${gbp(ap.maxTurnover)} appetite`));
+  if(emp!=null && ap.maxEmployees!=null && emp>ap.maxEmployees) k.push(it(`${emp} staff above ${ap.maxEmployees} maximum`));
   if(us!=null){
-    if(ap.maxUSPct!=null && us>ap.maxUSPct) k.push(`US/Canada ${us}% above ${ap.maxUSPct}% maximum`);
-    else if(ap.referUSPct!=null && us>ap.referUSPct) r.push(`US/Canada ${us}% of turnover needs referral`);
+    if(ap.maxUSPct!=null && us>ap.maxUSPct) k.push(it(`US/Canada ${us}% above ${ap.maxUSPct}% maximum`, ct.us));
+    else if(ap.referUSPct!=null && us>ap.referUSPct) r.push(it(`US/Canada ${us}% of turnover needs referral`, ct.us));
+    else if(us>0 && ct.us) g.push(it(`US/Canada ${us}% of turnover: check jurisdiction and US aggregate limit`, ct.us));
   }
-  acts.filter(x=>has(ap.excludedActivities,x)).forEach(x=>k.push(`Excludes ${label(ACTIVITIES,x).toLowerCase()}`));
-  acts.filter(x=>has(ap.referActivities,x)).forEach(x=>r.push(`Refers ${label(ACTIVITIES,x).toLowerCase()}`));
-  if(yrs!=null && ap.minYearsTrading && yrs<ap.minYearsTrading) r.push(`Under ${ap.minYearsTrading} year(s) trading`);
+  const actCite=x=>(ct.activities||{})[x];
+  acts.filter(x=>has(ap.excludedActivities,x)).forEach(x=>k.push(it(`Excludes ${label(ACTIVITIES,x).toLowerCase()}`, actCite(x))));
+  acts.filter(x=>has(ap.referActivities,x)).forEach(x=>r.push(it(`Refers ${label(ACTIVITIES,x).toLowerCase()}`, actCite(x))));
+  if(yrs!=null && ap.minYearsTrading && yrs<ap.minYearsTrading) r.push(it(`Under ${ap.minYearsTrading} year(s) trading`));
   const piL=num(a.piLimit), cyL=num(a.cyberLimit);
-  if(ap.maxPILimit && has(need,'pi') && piL && piL>ap.maxPILimit) r.push(`PI limit ${gbp(piL)} needs an excess layer above ${gbp(ap.maxPILimit)}`);
-  if(ap.maxPILimit && has(need,'cyber') && cyL && cyL>ap.maxPILimit) r.push(`Cyber limit ${gbp(cyL)} needs an excess layer`);
+  if(ap.maxPILimit && has(need,'pi') && piL && piL>ap.maxPILimit) r.push(it(`PI limit ${gbp(piL)} needs an excess layer above ${gbp(ap.maxPILimit)}`, ct.piLimit));
+  if(ap.maxPILimit && has(need,'cyber') && cyL && cyL>ap.maxPILimit) r.push(it(`Cyber limit ${gbp(cyL)} needs an excess layer`));
   if(has(need,'cyber')){
     const miss=(ap.requiredControls||[]).filter(c=>!has(ctrls,c));
-    if(miss.length) r.push('Missing controls: '+miss.map(c=>label(CONTROLS,c)).join('; '));
+    if(miss.length) r.push(it('Missing controls: '+miss.map(c=>label(CONTROLS,c)).join('; '), ct.controls));
   }
-  if(a.claims==='2') r.push('Two or more claims in 5 years');
-  if(a.circumstances==='yes') r.push('Known circumstance to disclose');
-  if(a.declined==='yes') (ap.declineIfPreviouslyDeclined?k:r).push('Previous decline, cancellation or special terms');
+  if(a.claims==='2') r.push(it('Two or more claims in 5 years', ct.claims));
+  if(a.circumstances==='yes') r.push(it('Known circumstance to disclose', ct.circumstances));
+  if(a.declined==='yes') (ap.declineIfPreviouslyDeclined?k:r).push(it('Previous decline, cancellation or special terms', ct.declined));
 
   let cov=0;
-  need.forEach(l=>{ const s=(p.lines||{})[l]||0; cov+=s/3; if(s===0) g.push(`Does not offer ${label(LINES,l).toLowerCase()}`); else if(s===1) g.push(`Limited ${label(LINES,l).toLowerCase()} cover`); else if(s===3) plus.push(label(LINES,l)); });
+  const lineCite=l=>(ct.lines||{})[l];
+  need.forEach(l=>{
+    const s=(p.lines||{})[l]||0, name=label(LINES,l).toLowerCase(); cov+=s/3;
+    if(s===0) g.push(it(`Does not offer ${name}`, lineCite(l)));
+    else if(s===1) g.push(it(`Limited ${name} cover`, lineCite(l)));
+    else if(s===2 && lineCite(l)) g.push(it(`Standard ${name} cover`, lineCite(l)));
+    else if(s===3) plus.push(it(label(LINES,l), lineCite(l)));
+  });
   const coverage = need.length? cov/need.length : 0;
   const pri = a.priority ? ((p.strengths||{})[a.priority]||0)/3 : 0.5;
   let score = Math.round(coverage*70 + pri*30) - r.length*8;
@@ -536,19 +652,20 @@ function assess(p){
 
 function generalFlags(){
   const a=answers, f=[];
-  if(a.contractTerms==='unlimited') f.push(['k','Uncapped liability in client contracts. Expect PI terms to exclude or limit this.']);
+  const fc=(providers.find(p=>p.citations&&p.citations.flags)||{citations:{flags:{}}}).citations.flags;
+  if(a.contractTerms==='unlimited') f.push(['k','Uncapped liability in client contracts. Expect PI terms to exclude or limit this.',fc.unlimited]);
   if(a.contractTerms==='none') f.push(['r','No written contracts. Weakens PI defence and scope of services.']);
-  if(a.cardData==='yes') f.push(['r','Handles card data. Confirm PCI DSS status and PCI fines cover.']);
+  if(a.cardData==='yes') f.push(['r','Handles card data. Confirm PCI DSS status and PCI fines cover.',fc.cardData]);
   if(has(a.lines,'cyber') && !has(a.controls,'mfaEmail')) f.push(['k','No MFA on email. Most cyber markets decline without it.']);
   if(has(a.lines,'cyber') && !has(a.controls,'backups')) f.push(['r','No tested offline backups. Ransomware terms will tighten.']);
-  if(a.records==='gt1m') f.push(['r','Over 1m personal records. Cyber limit of £1m is likely too low.']);
+  if(a.records==='gt1m') f.push(['r','Over 1m personal records. Cyber limit of £1m is likely too low.',fc.records]);
   if(has(a.sectors,'health')||has(a.sectors,'cni')||has(a.sectors,'public')) f.push(['g','Regulated or public sector clients. Check contract insurance minimums.']);
-  if(num(a.subcontractPct)>25) f.push(['g','Over 25% subcontracted. Confirm back-to-back contracts and sub-contractor vicarious cover.']);
+  if(num(a.subcontractPct)>25) f.push(['g','Over 25% subcontracted. Confirm back-to-back contracts and sub-contractor vicarious cover.',fc.subcontract]);
   const lc=num(a.largestContract), pl=num(a.piLimit);
   if(lc && pl && lc>pl) f.push(['r',`Largest contract ${gbp(lc)} exceeds PI limit ${gbp(pl)}.`]);
-  if(a.currentInsurer && a.retroDate) f.push(['g',`Keep retroactive date ${a.retroDate} on any new PI policy.`]);
-  if(a.currentInsurer && !a.retroDate && has(a.lines,'pi')) f.push(['r','Retroactive date missing. Ask for the current PI schedule.']);
-  if(!has(a.lines,'el') && num(a.employees)>1) f.push(['k',"Employers' liability not selected. Legal requirement with employees."]);
+  if(a.currentInsurer && a.retroDate) f.push(['g',`Keep retroactive date ${a.retroDate} on any new PI policy.`,fc.retro]);
+  if(a.currentInsurer && !a.retroDate && has(a.lines,'pi')) f.push(['r','Retroactive date missing. Ask for the current PI schedule.',fc.retro]);
+  if(!has(a.lines,'el') && num(a.employees)>1) f.push(['k',"Employers' liability not selected. Legal requirement with employees.",fc.el]);
   return f;
 }
 
@@ -557,6 +674,12 @@ function completeness(){
   const done = all.filter(filled).length;
   return Math.round(done/all.length*100);
 }
+
+function li(cls,text,cites,tag){
+  const cs=(cites||[]).filter(x=>CITATIONS[x]);
+  return `<li class="${cls}">${esc(text)}${cs.length?`<button type="button" class="cite" data-cites="${cs.join(',')}" aria-label="Show CFC policy wording for: ${esc(text)}" aria-expanded="false">${tag?tag+' ':''}§</button>`:''}</li>`;
+}
+function citeRef(k){ const c=CITATIONS[k]; return `${c.ref}, ${c.doc==='schedule'?'schedule PDF '+c.page:'wording '+c.page}` }
 
 function renderSide(){
   if(prospectMode && !previewing) return;
@@ -571,14 +694,15 @@ function renderSide(){
       </div>
       <div class="bar" aria-hidden="true"><i style="width:${x.score}%"></i></div>
       <ul class="reasons">
-        ${x.k.map(t=>`<li class="k">${esc(t)}</li>`).join('')}
-        ${x.r.map(t=>`<li class="r">${esc(t)}</li>`).join('')}
-        ${x.g.map(t=>`<li class="g">${esc(t)}</li>`).join('')}
-        ${x.plus.length?`<li class="p">Strong on ${esc(x.plus.join(', ').toLowerCase())}</li>`:''}
+        ${x.k.map(o=>li('k',o.t,o.c)).join('')}
+        ${x.r.map(o=>li('r',o.t,o.c)).join('')}
+        ${x.g.map(o=>li('g',o.t,o.c)).join('')}
+        ${x.plus.some(o=>o.c.length) ? x.plus.map(o=>li('p','Strong: '+o.t.toLowerCase(),o.c)).join('')
+          : x.plus.length?li('p','Strong on '+x.plus.map(o=>o.t).join(', ').toLowerCase()):''}
       </ul>
     </div>`).join('') : '<p class="note">Select the covers needed in step 5 to score providers.</p>';
   const fl = generalFlags();
-  document.getElementById('flags').innerHTML = fl.length ? fl.map(([c,t])=>`<li class="${c}">${esc(t)}</li>`).join('') : '<li class="p">No general flags from answers so far.</li>';
+  document.getElementById('flags').innerHTML = fl.length ? fl.map(([c,t,cs])=>li(c,t,cs,'CFC')).join('') : '<li class="p">No general flags from answers so far.</li>';
 }
 
 /* ---------- Export ---------- */
@@ -589,9 +713,9 @@ function summaryText(withScores){
     lines.push('', 'PROVIDER FIT');
     providers.map(assess).sort((x,y)=>y.score-x.score).forEach(x=>{
       lines.push(`${x.p.name} (${x.p.product}): ${x.score}/100, ${({good:'good fit',refer:'refer',bad:'unlikely'})[x.status]}`);
-      [...x.k,...x.r,...x.g].forEach(t=>lines.push('  - '+t));
+      [...x.k,...x.r,...x.g].forEach(o=>lines.push('  - '+o.t+(o.c.length?` [${o.c.map(citeRef).join('; ')}]`:'')));
     });
-    const fl=generalFlags(); if(fl.length){ lines.push('', 'UNDERWRITING FLAGS'); fl.forEach(([,t])=>lines.push('  - '+t)) }
+    const fl=generalFlags(); if(fl.length){ lines.push('', 'UNDERWRITING FLAGS'); fl.forEach(([,t,cs])=>lines.push('  - '+t+((cs||[]).length?` [CFC: ${cs.map(citeRef).join('; ')}]`:''))) }
   }
   return lines.join('\n');
 }
@@ -628,7 +752,7 @@ document.getElementById('btnClear2').onclick=clearAll;
 document.getElementById('btnProspectView').onclick=()=>{ previewing=true; step=0; submitted=false; render(); window.scrollTo({top:0}) };
 document.getElementById('btnAdviserView').onclick=()=>{ previewing=false; render() };
 document.getElementById('btnCopySummary').onclick=()=>copy(summaryText(true));
-document.getElementById('btnCopyJson').onclick=()=>copy(JSON.stringify({answers, scoredAt:new Date().toISOString(), results:providers.map(assess).map(x=>({provider:x.p.id,score:x.score,status:x.status,knockouts:x.k,refers:x.r,gaps:x.g}))},null,2));
+document.getElementById('btnCopyJson').onclick=()=>copy(JSON.stringify({answers, scoredAt:new Date().toISOString(), results:providers.map(assess).map(x=>({provider:x.p.id,score:x.score,status:x.status,knockouts:x.k.map(o=>({text:o.t,citations:o.c.map(citeRef)})),refers:x.r.map(o=>({text:o.t,citations:o.c.map(citeRef)})),gaps:x.g.map(o=>({text:o.t,citations:o.c.map(citeRef)}))}))},null,2));
 document.getElementById('btnRules').onclick=openRules;
 document.getElementById('btnCloseRules').onclick=()=>document.getElementById('rulesCard').hidden=true;
 document.getElementById('btnCopyRules').onclick=()=>copy(document.getElementById('rules').value,'rules');
@@ -642,6 +766,42 @@ document.getElementById('btnApplyRules').onclick=()=>{
     document.getElementById('rulesSource').textContent='Custom rules in this browser'; toast('Rules applied');
   }catch(e){ err.textContent='Rules not applied. '+e.message }
 };
+/* ---------- Citation popout ---------- */
+const pop=document.getElementById('pop');
+let popBtn=null, popPinned=false, popTimer=null;
+function showPop(btn, pin){
+  clearTimeout(popTimer);
+  if(popBtn && popBtn!==btn) popBtn.setAttribute('aria-expanded','false');
+  popBtn=btn; popPinned=!!pin; btn.setAttribute('aria-expanded','true');
+  pop.innerHTML = btn.dataset.cites.split(',').map(k=>{ const c=CITATIONS[k]; return `<div class="c-item">
+      <div class="c-head"><span class="c-ref">${esc(c.ref)}</span><span class="c-src">${c.doc==='schedule'?'PDF ':''}${esc(c.page)}</span></div>
+      <div class="c-src">${esc(DOCS[c.doc])}</div>
+      <blockquote>${esc(c.quote)}</blockquote>
+      ${c.why?`<p class="c-why">${esc(c.why)}</p>`:''}</div>` }).join('')
+    + (popPinned?'<button type="button" class="ghost" id="popClose" style="align-self:flex-end;font-size:12px;padding:4px 10px">Close</button>':'');
+  pop.hidden=false;
+  const b=btn.getBoundingClientRect(), w=pop.offsetWidth, h=pop.offsetHeight, vw=innerWidth, vh=innerHeight;
+  let left=Math.min(Math.max(16,b.right-w), vw-w-16);
+  let top=b.bottom+8; if(top+h>vh-16) top=Math.max(16,b.top-h-8);
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+  const cl=document.getElementById('popClose'); if(cl) cl.onclick=()=>{ hidePop(); btn.focus() };
+}
+function hidePop(){ clearTimeout(popTimer); pop.hidden=true; popPinned=false; if(popBtn) popBtn.setAttribute('aria-expanded','false'); popBtn=null }
+function hideSoon(){ if(popPinned) return; clearTimeout(popTimer); popTimer=setTimeout(hidePop,180) }
+document.addEventListener('mouseover',e=>{ const b=e.target.closest&&e.target.closest('button.cite'); if(b) showPop(b,popPinned&&popBtn===b) });
+document.addEventListener('mouseout',e=>{ const b=e.target.closest&&e.target.closest('button.cite'); if(b && !b.contains(e.relatedTarget) && !pop.contains(e.relatedTarget)) hideSoon() });
+pop.addEventListener('mouseenter',()=>clearTimeout(popTimer));
+pop.addEventListener('mouseleave',hideSoon);
+document.addEventListener('focusin',e=>{ if(e.target.matches&&e.target.matches('button.cite')) showPop(e.target,popPinned&&popBtn===e.target); else if(!pop.contains(e.target)) { if(!popPinned) hidePop() } });
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('button.cite');
+  if(b){ e.preventDefault(); (popPinned&&popBtn===b)?hidePop():showPop(b,true); return }
+  if(!pop.contains(e.target)) hidePop();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ const b=popBtn; hidePop(); if(b) b.focus() } });
+addEventListener('scroll',()=>{ if(!pop.hidden) hidePop() },{passive:true});
+addEventListener('resize',()=>{ if(!pop.hidden) hidePop() });
+
 if(prospectMode){ document.getElementById('pageTitle').textContent='Insurance qualification' }
 render();
 </script>
